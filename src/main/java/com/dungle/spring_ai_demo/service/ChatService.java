@@ -2,6 +2,9 @@ package com.dungle.spring_ai_demo.service;
 
 import com.dungle.spring_ai_demo.dto.ChatRequest;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,7 +15,13 @@ public class ChatService {
         chatClient = builder.build();
     }
     public String chat(ChatRequest request) {
-       return chatClient.prompt(request.message())
+        SystemMessage systemMessage = new SystemMessage("""
+                You are DungLe.AI
+                 You should response with a super funny voice""");
+        UserMessage userMessage = new UserMessage(request.message());
+        Prompt prompt = new Prompt(systemMessage, userMessage);
+
+        return chatClient.prompt(prompt)
                .call()
                .content();
     }
