@@ -4,8 +4,12 @@ import com.dungle.spring_ai_demo.dto.ChatRequest;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.content.Media;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ChatService {
@@ -24,5 +28,26 @@ public class ChatService {
         return chatClient.prompt(prompt)
                .call()
                .content();
+    }
+
+    public String chatWithImage(MultipartFile file, String message) {
+        Media media = Media.builder()
+                .data(file.getResource())
+                .mimeType(MimeTypeUtils.parseMimeType(file.getContentType()))
+                .build();
+
+        ChatOptions chatOptions = ChatOptions.builder()
+                .temperature(0.1) // do chinh xac
+                .build();
+
+        return chatClient.prompt()
+                .options(chatOptions)
+                .system("You are DungLe.AI")
+                .user(promptUserSpec
+                -> promptUserSpec.media(media)
+                .text(message))
+                .call()
+                .content();
+
     }
 }
